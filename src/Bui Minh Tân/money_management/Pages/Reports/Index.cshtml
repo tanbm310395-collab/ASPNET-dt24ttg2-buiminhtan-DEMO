@@ -1,0 +1,35 @@
+﻿@page
+@model money_management.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "Báo cáo tài chính";
+}
+
+<h2>Báo cáo tài chính</h2>
+
+<div class="row mb-4">
+    <div class="col-md-6 alert alert-success">
+        Tổng thu: <strong>@Model.TotalIncome.ToString("N0") đ</strong>
+    </div>
+    <div class="col-md-6 alert alert-danger">
+        Tổng chi: <strong>@Model.TotalExpense.ToString("N0") đ</strong>
+    </div>
+</div>
+
+<h4>Chi tiết theo danh mục</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Danh mục</th>
+            <th>Tổng tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.CategoryReports)
+        {
+            <tr>
+                <td>@item.CategoryName</td>
+                <td>@item.Total.ToString("N0") đ</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,90 @@
+﻿@page
+@model money_management.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Trang tổng quan";
+}
+
+<h2 class="mb-4">Tổng quan chi tiêu</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="alert alert-success">Tổng thu: <strong>@Model.TotalIncome.ToString("N0") đ</strong></div>
+    </div>
+    <div class="col-md-4">
+        <div class="alert alert-danger">Tổng chi: <strong>@Model.TotalExpense.ToString("N0") đ</strong></div>
+    </div>
+    <div class="col-md-4">
+        <div class="alert alert-primary">Số dư: <strong>@Model.Balance.ToString("N0") đ</strong></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Tiến độ tiết kiệm</h4>
+        <ul class="list-group">
+            @foreach (var goal in Model.SavingGoals)
+            {
+                var percent = goal.CurrentAmount * 100 / goal.TargetAmount;
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    @goal.Title
+                    <span class="badge bg-info">@percent% đạt được</span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Cảnh báo ngân sách</h4>
+        <ul class="list-group">
+            @foreach (var alert in Model.BudgetAlerts)
+            {
+                <li class="list-group-item text-danger">@alert</li>
+            }
+        </ul>
+    </div>
+</div>
+
+<h4>Biểu đồ thu/chi 6 tháng gần nhất</h4>
+<canvas id="incomeExpenseChart" height="100"></canvas>
+
+<h4>Phân bổ chi tiêu theo danh mục</h4>
+<canvas id="categoryPieChart" height="100"></canvas>
+
+@section Scripts {
+    <script>
+        var categoryCtx = document.getElementById('categoryPieChart').getContext('2d');
+        var pieChart = new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.ExpenseByCategory.Keys)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.ExpenseByCategory.Values)),
+                    backgroundColor: ['#ff6384','#36a2eb','#cc65fe','#ffce56','#4bc0c0']
+                }]
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.Months)),
+                datasets: [
+                    {
+                        label: 'Thu nhập',
+                        backgroundColor: 'green',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyIncome))
+                    },
+                    {
+                        label: 'Chi tiêu',
+                        backgroundColor: 'red',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyExpense))
+                    }
+                ]
+            }
+        });
+    </script>
+}
+

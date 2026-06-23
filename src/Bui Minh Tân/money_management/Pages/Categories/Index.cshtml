@@ -1,0 +1,133 @@
+﻿@page
+@model money_management.Pages.Categories.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<h2 class="mb-4">Quản lý danh mục</h2>
+
+<!-- Nút Thêm -->
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
+    <i class="bi bi-plus-circle"></i> Thêm danh mục
+</button>
+@if (!ViewData.ModelState.IsValid)
+{
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                    <div>@error.ErrorMessage</div>
+            }
+        </div>
+}
+<!-- Bảng hiển thị danh mục -->
+<table class="table table-hover table-bordered text-center align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th class="text-start">Tên</th>
+            <th>Loại</th>
+            <th style="width: 120px;">Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model.Categories)
+        {
+                <tr>
+                    <td class="text-start">@c.Name</td>
+                    <td>
+                        @if (c.Type == "income")
+                        {
+                                <span class="badge bg-success">Thu nhập</span>
+                        }
+                        else
+                        {
+                                <span class="badge bg-danger">Chi tiêu</span>
+                        }
+                    </td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" class="d-inline">
+                            <button class="btn btn-sm btn-outline-danger me-1" onclick="return confirm('Bạn có chắc muốn xóa?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editModal"
+                                onclick="fillEdit(@c.Id, '@c.Name', '@c.Type')">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>
+
+
+<!-- Modal Thêm -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Add">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm danh mục</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label asp-for="NewCategory.Name" class="form-label">Tên</label>
+                        <input asp-for="NewCategory.Name" class="form-control" />
+                        <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NewCategory.Type" class="form-label">Loại</label>
+                        <select asp-for="NewCategory.Type" class="form-select">
+                            <option value="income">Thu nhập</option>
+                            <option value="expense">Chi tiêu</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Sửa -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Edit">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sửa danh mục</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Category.Id" id="edit-id" />
+                    <div class="mb-3">
+                        <label asp-for="Category.Name" class="form-label">Tên</label>
+                        <input asp-for="Category.Name" id="edit-name" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Category.Type" class="form-label">Loại</label>
+                        <select asp-for="Category.Type" id="edit-type" class="form-select">
+                            <option value="income">Thu nhập</option>
+                            <option value="expense">Chi tiêu</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function fillEdit(id, name, type) {
+            document.getElementById("edit-id").value = id;
+            document.getElementById("edit-name").value = name;
+            document.getElementById("edit-type").value = type;
+        }
+    </script>
+}
